@@ -9,7 +9,6 @@ import NetworkBadge from '@/components/NetworkBadge'
 import AlertRuleBadge from '@/components/AlertRuleBadge'
 import WebhookLog from '@/components/WebhookLog'
 import RuleBuilder from '@/components/RuleBuilder'
-import EmptyState from '@/components/EmptyState'
 
 export default function ContractDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()

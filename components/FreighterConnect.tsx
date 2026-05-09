@@ -44,7 +44,7 @@ export default function FreighterConnect({ onConnect, className = '' }: Freighte
       const key = await window.freighter.getPublicKey()
       setPublicKey(key)
       onConnect?.(key)
-    } catch (e) {
+    } catch {
       setError('Connection rejected')
     } finally {
       setLoading(false)
