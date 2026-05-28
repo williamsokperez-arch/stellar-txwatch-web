@@ -57,3 +57,13 @@ export function getTodayAlertCount(): number {
   const start = new Date().setHours(0, 0, 0, 0)
   return load<AlertPayload>(ALERTS_KEY).filter((a) => a.timestamp >= start).length
 }
+
+export function onAlertsChange(callback: () => void): () => void {
+  const handler = (e: StorageEvent) => {
+    if (e.key === ALERTS_KEY) {
+      callback()
+    }
+  }
+  window.addEventListener('storage', handler)
+  return () => window.removeEventListener('storage', handler)
+}
