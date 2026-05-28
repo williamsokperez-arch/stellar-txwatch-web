@@ -2,18 +2,17 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { WatchedContract } from '@/types'
-import { getContracts, getTodayAlertCount, getAlerts } from '@/lib/storage'
+import { useContracts } from '@/lib/useContracts'
+import { getTodayAlertCount, getAlerts } from '@/lib/storage'
 import ContractCard from '@/components/ContractCard'
 import EmptyState from '@/components/EmptyState'
 
 export default function DashboardPage() {
-  const [contracts, setContracts] = useState<WatchedContract[]>([])
+  const { contracts } = useContracts()
   const [alertsToday, setAlertsToday] = useState(0)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    setContracts(getContracts())
     setAlertsToday(getTodayAlertCount())
     setMounted(true)
   }, [])
