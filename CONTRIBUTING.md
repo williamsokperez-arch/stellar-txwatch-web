@@ -54,3 +54,18 @@ All types live in `types/index.ts` and must stay in sync with the Rust structs i
 - Keep PRs focused — one feature or fix per PR
 - All pages must be mobile responsive and dark-mode compatible
 - Run `npm run build` before opening a PR — zero lint errors required
+
+## Issue labels
+
+When opening an issue, consider adding one or more of these labels:
+
+| Label | Use case |
+|-------|----------|
+| `good first issue` | Beginner-friendly tasks, great for new contributors |
+| `bug` | Unexpected behavior or defects |
+| `ui` | User interface, styling, or design changes |
+| `tests` | Test coverage, test infrastructure, or test improvements |
+| `wallet` | Freighter integration or wallet-related features |
+| `docs` | Documentation, README, or contributor guides |
+| `area: core` | Core business logic or data handling |
+| `area: stellar` | Stellar integration, Horizon, or Soroban RPC |
