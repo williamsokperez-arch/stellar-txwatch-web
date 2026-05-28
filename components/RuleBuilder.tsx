@@ -35,8 +35,12 @@ export default function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
 
   function addRule() {
     if (draft.type === 'LargeTransfer') {
-      if (!draft.threshold_xlm || draft.threshold_xlm <= 0) {
-        setError('Enter a positive XLM threshold')
+      if (draft.threshold_xlm === undefined || draft.threshold_xlm === null || isNaN(draft.threshold_xlm)) {
+        setError('Enter a valid XLM threshold')
+        return
+      }
+      if (draft.threshold_xlm <= 0) {
+        setError('Threshold must be greater than 0')
         return
       }
     }
