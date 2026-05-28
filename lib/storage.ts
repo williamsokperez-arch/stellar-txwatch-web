@@ -30,7 +30,16 @@ export function saveContract(contract: WatchedContract) {
 }
 
 export function deleteContract(id: string) {
+  const contract = getContract(id)
   save(CONTRACTS_KEY, getContracts().filter((c) => c.id !== id))
+  if (contract) {
+    deleteAlerts(contract.contract_id)
+  }
+}
+
+export function deleteAlerts(contractId: string) {
+  const alerts = load<AlertPayload>(ALERTS_KEY)
+  save(ALERTS_KEY, alerts.filter((a) => a.contract_id !== contractId))
 }
 
 export function getAlerts(contractId: string): AlertPayload[] {
