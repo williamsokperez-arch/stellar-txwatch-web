@@ -8,15 +8,22 @@ interface FreighterConnectProps {
 }
 
 export default function FreighterConnect({ onConnect, className = '' }: FreighterConnectProps) {
-  const { publicKey, loading, error, connect, disconnect } = useFreighter()
+  const { publicKey, network, loading, error, connect, disconnect } = useFreighter()
 
   if (publicKey) {
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
-        <span className="text-sm text-zinc-300 font-mono">
-          {publicKey.slice(0, 4)}…{publicKey.slice(-4)}
-        </span>
+        <div className="flex flex-col gap-0.5">
+          <span className="text-sm text-zinc-300 font-mono">
+            {publicKey.slice(0, 4)}…{publicKey.slice(-4)}
+          </span>
+          {network && (
+            <span className="text-xs text-zinc-500 capitalize">
+              {network.toLowerCase()}
+            </span>
+          )}
+        </div>
         <button
           onClick={disconnect}
           className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
