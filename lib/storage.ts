@@ -101,3 +101,8 @@ export function getTodayAlertCount(): number {
   const start = new Date().setHours(0, 0, 0, 0)
   return load<AlertPayload>(ALERTS_KEY).filter((a) => a.timestamp >= start).length
 }
+
+export function getLastAlertAt(contractId: string): number | null {
+  const alerts = getAlerts(contractId)
+  return alerts.length > 0 ? Math.max(...alerts.map((a) => a.timestamp)) : null
+}
