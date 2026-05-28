@@ -230,6 +230,73 @@ See [`.github/workflows/ci.yml`](./.github/workflows/ci.yml).
 - [stellar-txwatch-core](https://github.com/Tx-wat/stellar-txwatch-core) — Rust monitoring engine
 - [stellar-txwatch-contracts](https://github.com/Tx-wat/stellar-txwatch-contracts) — Soroban smart contracts
 
+## Data Persistence
+
+The current app stores all contracts and alert rules in **browser localStorage** rather than a backend database. This means:
+
+- Contracts and rules are persisted locally per browser/device
+- Data is not synced across devices or browsers
+- Clearing browser storage will delete all saved contracts and rules
+- No server-side persistence layer is currently implemented
+
+When a backend API is integrated (via `NEXT_PUBLIC_API_URL`), the app will transition to server-side persistence.
+
+## API Limitations
+
+The dashboard currently operates in two modes:
+
+### Mock/Local Mode (Default)
+- Contract registration and alert rule configuration are stored locally
+- Webhook testing uses mock payloads
+- No real-time monitoring occurs without a backend
+
+### API Mode (When `NEXT_PUBLIC_API_URL` is set)
+- Contracts and rules sync with the txwatch-core backend
+- Real webhook delivery and monitoring depend on the backend service
+- Requires the [stellar-txwatch-core](https://github.com/Tx-wat/stellar-txwatch-core) API running
+
+**Note:** The dashboard itself does not monitor transactions. Monitoring is performed by the core engine. The dashboard is a configuration and monitoring UI only.
+
+## Screenshots
+
+### Landing Page
+The landing page introduces the dashboard and provides quick access to wallet connection and contract registration.
+
+### Dashboard
+The dashboard displays registered contracts in a grid layout with summary cards showing contract ID, network, and alert rule count.
+
+### Contract Detail
+The contract detail page shows:
+- Contract metadata (ID, network, registration date)
+- Configured alert rules with type badges
+- Webhook delivery history with transaction links to Stellar Expert
+
+### Add Contract Form
+The form allows users to:
+- Enter a contract ID (validated against Soroban address format)
+- Select the network (Mainnet, Testnet, Futurenet)
+- Configure alert rules (large transfers, function calls, admin actions, failed transactions)
+- Test webhook delivery before going live
+
+## Bug Reports & Feature Requests
+
+When reporting issues or requesting features, please include:
+
+### For Bug Reports
+- Steps to reproduce the issue
+- Expected vs. actual behavior
+- Browser and OS information
+- Screenshots or error messages if applicable
+- Whether the issue occurs in mock mode or with a backend API
+
+### For Feature Requests
+- Clear description of the desired functionality
+- Use case or problem it solves
+- Suggested implementation approach (if any)
+- Whether it's a UI/UX enhancement or backend integration
+
+Please check existing issues before opening a new one to avoid duplicates.
+
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
