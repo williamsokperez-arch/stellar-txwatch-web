@@ -12,12 +12,30 @@ const RULE_TYPES: AlertRuleType[] = [
   'TransactionFailed',
 ]
 
+const RULE_EXAMPLES: Record<AlertRuleType, string> = {
+  'AnyTransaction': 'Alert on every transaction',
+  'LargeTransfer': 'Alert when transfer amount exceeds threshold',
+  'FunctionCalled': 'Alert when a specific function is called',
+  'AdminFunctionCalled': 'Alert when admin functions are called',
+  'TransactionFailed': 'Alert on failed transactions',
+}
+
 interface RuleBuilderProps {
   rules: AlertRule[]
   onChange: (rules: AlertRule[]) => void
 }
 
 const emptyRule = (): AlertRule => ({ type: 'AnyTransaction' })
+
+function rulesEqual(a: AlertRule, b: AlertRule): boolean {
+  if (a.type !== b.type) return false
+  if (a.threshold_xlm !== b.threshold_xlm) return false
+  if (a.function_name !== b.function_name) return false
+  if (!a.function_names && !b.function_names) return true
+  if (!a.function_names || !b.function_names) return false
+  return a.function_names.length === b.function_names.length &&
+    a.function_names.every((f, i) => f === b.function_names![i])
+}
 
 export default function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
   const [draft, setDraft] = useState<AlertRule>(emptyRule())
@@ -51,7 +69,16 @@ export default function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
         setError('Enter at least one function name')
         return
       }
+      // Sort function names for consistency
+      draft.function_names = [...draft.function_names].sort()
     }
+
+    // Check for duplicates
+    if (rules.some((rule) => rulesEqual(rule, draft))) {
+      setError('This rule already exists')
+      return
+    }
+
     onChange([...rules, draft])
     setDraft(emptyRule())
     setError(null)
@@ -75,6 +102,7 @@ export default function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
+          <p className="text-xs text-zinc-500 mt-1">{RULE_EXAMPLES[draft.type]}</p>
         </div>
 
         {draft.type === 'LargeTransfer' && (
@@ -142,34 +170,48 @@ export default function RuleBuilder({ rules, onChange }: RuleBuilderProps) {
       </div>
 
       {rules.length > 0 && (
-        <ul className="space-y-2">
-          {rules.map((rule, i) => (
-            <li key={i} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <AlertRuleBadge type={rule.type} />
-                {rule.threshold_xlm !== undefined && (
-                  <span className="text-xs text-zinc-400">≥ {rule.threshold_xlm} XLM</span>
-                )}
-                {rule.function_name && (
-                  <span className="text-xs font-mono text-zinc-400">{rule.function_name}</span>
-                )}
-                {rule.function_names?.length ? (
-                  <span className="text-xs font-mono text-zinc-400">{rule.function_names.join(', ')}</span>
-                ) : null}
-              </div>
-              <button
-                type="button"
-                onClick={() => removeRule(i)}
-                className="text-zinc-600 hover:text-red-400 transition-colors ml-2"
-                aria-label="Remove rule"
-              >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-2">
+          <p className="text-xs text-zinc-500">
+            {rules.length} rule{rules.length !== 1 ? 's' : ''} added
+            {rules.length > 0 && (
+              <span className="ml-2">
+                ({rules.filter(r => r.type === 'AnyTransaction').length} AnyTransaction,{' '}
+                {rules.filter(r => r.type === 'LargeTransfer').length} LargeTransfer,{' '}
+                {rules.filter(r => r.type === 'FunctionCalled').length} FunctionCalled,{' '}
+                {rules.filter(r => r.type === 'AdminFunctionCalled').length} AdminFunctionCalled,{' '}
+                {rules.filter(r => r.type === 'TransactionFailed').length} TransactionFailed)
+              </span>
+            )}
+          </p>
+          <ul className="space-y-2">
+            {rules.map((rule, i) => (
+              <li key={i} className="flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <AlertRuleBadge type={rule.type} />
+                  {rule.threshold_xlm !== undefined && (
+                    <span className="text-xs text-zinc-400">≥ {rule.threshold_xlm} XLM</span>
+                  )}
+                  {rule.function_name && (
+                    <span className="text-xs font-mono text-zinc-400">{rule.function_name}</span>
+                  )}
+                  {rule.function_names?.length ? (
+                    <span className="text-xs font-mono text-zinc-400">{rule.function_names.join(', ')}</span>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeRule(i)}
+                  className="text-zinc-600 hover:text-red-400 transition-colors ml-2"
+                  aria-label="Remove rule"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   )
