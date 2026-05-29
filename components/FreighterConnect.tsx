@@ -12,6 +12,8 @@ declare global {
   }
 }
 
+const WALLET_STORAGE_KEY = 'freighter_public_key'
+
 interface FreighterConnectProps {
   onConnect?: (publicKey: string) => void
   className?: string
@@ -21,6 +23,8 @@ export default function FreighterConnect({ onConnect, className = '' }: Freighte
   const [publicKey, setPublicKey] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isConnecting, setIsConnecting] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
 
   useEffect(() => {
     checkConnection()
@@ -42,6 +46,8 @@ export default function FreighterConnect({ onConnect, className = '' }: Freighte
   }
 
   async function connect() {
+    if (isConnecting) return
+    setIsConnecting(true)
     setLoading(true)
     setError(null)
     try {
@@ -51,17 +57,26 @@ export default function FreighterConnect({ onConnect, className = '' }: Freighte
         return
       }
       const key = await window.freighter.getPublicKey()
+      const network = await window.freighter.getNetwork()
+      if (!key || !network) {
+        setError('Failed to retrieve wallet information')
+        return
+      }
       setPublicKey(key)
+      localStorage.setItem(WALLET_STORAGE_KEY, key)
       onConnect?.(key)
-    } catch {
-      setError('Connection rejected')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Connection rejected'
+      setError(message)
     } finally {
       setLoading(false)
+      setIsConnecting(false)
     }
   }
 
   function disconnect() {
     setPublicKey(null)
+    localStorage.removeItem(WALLET_STORAGE_KEY)
   }
 
   if (publicKey) {
@@ -77,6 +92,14 @@ export default function FreighterConnect({ onConnect, className = '' }: Freighte
         >
           Disconnect
         </button>
+      </div>
+    )
+  }
+
+  if (isInitializing) {
+    return (
+      <div className={`flex items-center gap-2 ${className}`}>
+        <div className="w-24 h-9 rounded-lg bg-zinc-800 animate-pulse" />
       </div>
     )
   }
