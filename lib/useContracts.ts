@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { WatchedContract } from '@/types'
-import { getContracts, saveContract, deleteContract } from '@/lib/storage'
+import { getContracts, saveContract, deleteContract, onContractsChange } from '@/lib/storage'
 
 export function useContracts() {
   const [contracts, setContracts] = useState<WatchedContract[]>([])
@@ -13,6 +13,8 @@ export function useContracts() {
 
   useEffect(() => {
     refresh()
+    const unsubscribe = onContractsChange(refresh)
+    return unsubscribe
   }, [refresh])
 
   function add(contract: WatchedContract) {
